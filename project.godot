@@ -11,6 +11,7 @@ config_version=5
 [application]
 
 config/name="Truque"
+run/main_scene="uid://wm7no0qt7q1f"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 
@@ -18,6 +19,11 @@ config/icon="res://icon.svg"
 
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
+window/vsync/vsync_mode=0
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/script-ide/plugin.cfg")
 
 [physics]
 
