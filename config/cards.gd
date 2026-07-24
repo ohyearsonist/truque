@@ -141,4 +141,12 @@ const CARDS = {
 	}
 }
 
-var CARD_ORDER = ["JX", "QX", "KX", "AX", "2X", "3X", "JO", "7D", "AS", "7H", "4C"]
+const CARD_ORDER = [
+	"JC", "JH", "JD", "JS",
+	"QC", "QH", "QD", "QS",
+	"KC", "KH", "KD", "KS",
+	"AC", "AH", "AD",
+	"2C", "2H", "2D", "2S",
+	"3C", "3H", "3D", "3S",
+	"JO", "7D", "AS", "7H", "4C"
+]

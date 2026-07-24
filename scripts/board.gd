@@ -2,18 +2,26 @@ extends Node2D
 
 const COLLISION_MASK_CARD = 1
 const COLLISION_MASK_CARD_SLOT = 2
+const FIRST_PLAYER = 0
+
+signal player_turn
+signal partner_turn
+signal round_over
 
 var card_being_dragged
 var screen_size
 var is_hovering_on_card
 var cardConfigs
 var player_hand
+var current_player = FIRST_PLAYER
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	screen_size = get_viewport_rect().size
 	cardConfigs = preload("res://config/cards.gd")
 	player_hand = $"../PlayerHand"
+	
+	self.call_deferred("_on_turn_ready")
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -25,7 +33,7 @@ func _input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if event.pressed:
 			var card = raycast_check_for_card()
-			if card:
+			if card and card.is_draggable:
 				start_drag(card)
 		else:
 			finish_drag()
@@ -36,17 +44,26 @@ func start_drag(card):
 		card_being_dragged.slot.card_in_slot = false
 		card_being_dragged.slot = null
 	card_being_dragged.scale = Vector2(1, 1)
+	card_being_dragged.rotation = 0
 
 func finish_drag():
 	if card_being_dragged:
 		card_being_dragged.scale = Vector2(1.05, 1.05)
 		
 		var card_slot_found = raycast_check_for_card_slot()
-		if card_slot_found and not card_slot_found.card_in_slot:
+		if card_slot_found: # and not card_slot_found.card_in_slot:
 			player_hand.remove_card_from_hand(card_being_dragged)
 			card_slot_found.card_in_slot = true
-			card_being_dragged.position = card_slot_found.position
+			
+			var positionTween = get_tree().create_tween()
+			var rotationTween = get_tree().create_tween()
+			positionTween.tween_property(card_being_dragged, "position", card_slot_found.position, 0.1)
+			rotationTween.tween_property(card_being_dragged, "rotation", randi() % 360, 0.1)
+			
 			card_being_dragged.slot = card_slot_found
+			card_being_dragged.is_draggable = false
+			print("Player played")
+			player_hand.emit_signal("turn_ready")
 		else:
 			player_hand.add_card_to_hand(card_being_dragged)
 		
@@ -72,12 +89,10 @@ func _on_hovered_off_card(card):
 		is_hovering_on_card = false
 
 func highlight_card(card, hovered):
-	if hovered:
+	if hovered and card.is_draggable:
 		card.scale = Vector2(1.05, 1.05)
-		card.z_index = 2
 	else:
 		card.scale = Vector2(1, 1)
-		card.z_index = 1
 
 func raycast_check_for_card_slot() -> Node2D:
 	var space_state = get_world_2d().direct_space_state
@@ -101,6 +116,20 @@ func raycast_check_for_card() -> Node2D:
 		return get_card_with_highest_z_index(result)
 	return null 
 
+func raycast_check_for_pile(position: Vector2):
+	var space_state = get_world_2d().direct_space_state
+	var parameters = PhysicsPointQueryParameters2D.new()
+	parameters.position = position
+	parameters.collide_with_areas = true
+	parameters.collision_mask = COLLISION_MASK_CARD
+	var result = space_state.intersect_point(parameters)
+	if result.size() > 0:
+		var new_result = []
+		for i in range(result.size()):
+			new_result.append(result[i].collider.get_parent())
+		return result
+	return null 
+
 func get_card_with_highest_z_index(cards):
 	var highest_z_card = cards[0].collider.get_parent()
 	var highest_z_index = highest_z_card.z_index
@@ -112,3 +141,38 @@ func get_card_with_highest_z_index(cards):
 			highest_z_index = current_card.z_index
 	
 	return highest_z_card
+
+func sort_z_indexes():
+	var sorted_cards = {}
+	for card in self.get_children():
+		var i = cardConfigs.CARD_ORDER.find(card.name)
+		sorted_cards[card] = i
+	
+	for card in sorted_cards:
+		card.z_index = sorted_cards[card]
+
+func _on_turn_ready() -> void:
+	sort_z_indexes()
+	if current_player == 0:
+		current_player += 1
+		emit_signal("player_turn")
+	elif current_player == 1:
+		current_player += 1
+		emit_signal("partner_turn")
+	else:
+		current_player = 0
+		emit_signal("round_over")
+
+func _on_round_over() -> void:
+	await get_tree().create_timer(0.5).timeout
+	var pile = raycast_check_for_pile(Vector2(screen_size.x/2, screen_size.y/2))
+	var high_card = get_card_with_highest_z_index(pile)
+	print(high_card.player)
+	print(pile)
+	for i in pile:
+		var card = i.collider.get_parent()
+		var posTween = get_tree().create_tween()
+		posTween.tween_property(card, "position", Vector2(screen_size.x/2, screen_size.y * 1.3), 0.1)
+		await posTween.finished
+		card.queue_free()
+	_on_turn_ready()

@@ -3,14 +3,28 @@
 [ext_resource type="Script" uid="uid://g8k2na6b4ymd" path="res://scripts/board.gd" id="1_0wfyh"]
 [ext_resource type="PackedScene" uid="uid://bb21xlxgfnms3" path="res://scenes/CardSlot.tscn" id="3_sugp2"]
 [ext_resource type="Script" uid="uid://bh64vje6gam5j" path="res://scripts/player_hand.gd" id="4_jyhfs"]
+[ext_resource type="Script" uid="uid://c12pwowhptta0" path="res://scripts/partner_hand.gd" id="4_tbgi4"]
+[ext_resource type="Script" uid="uid://ergwc4xi8w5o" path="res://scripts/deck.gd" id="5_tbgi4"]
 
 [node name="Main" type="Node2D" unique_id=724509265]
+
+[node name="Deck" type="Node2D" parent="." unique_id=1157127306]
+script = ExtResource("5_tbgi4")
 
 [node name="Board" type="Node2D" parent="." unique_id=1635455840]
 script = ExtResource("1_0wfyh")
 
 [node name="CardSlot" parent="." unique_id=1931621865 instance=ExtResource("3_sugp2")]
-position = Vector2(185, 316)
+position = Vector2(990, 540)
 
 [node name="PlayerHand" type="Node2D" parent="." unique_id=162095679]
 script = ExtResource("4_jyhfs")
+
+[node name="PartnerHand" type="Node2D" parent="." unique_id=1547613113]
+script = ExtResource("4_tbgi4")
+
+[connection signal="partner_turn" from="Board" to="PartnerHand" method="_on_turn"]
+[connection signal="player_turn" from="Board" to="PlayerHand" method="_on_turn"]
+[connection signal="round_over" from="Board" to="Board" method="_on_round_over"]
+[connection signal="turn_ready" from="PlayerHand" to="Board" method="_on_turn_ready"]
+[connection signal="turn_ready" from="PartnerHand" to="Board" method="_on_turn_ready"]
