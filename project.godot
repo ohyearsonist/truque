@@ -36,3 +36,4 @@ enabled=PackedStringArray("res://addons/script-ide/plugin.cfg")
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+environment/defaults/default_clear_color=Color(8.4228816e-08, 0.2647736, 0.16088012, 1)

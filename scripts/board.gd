@@ -6,20 +6,41 @@ const FIRST_PLAYER = 0
 
 signal player_turn
 signal partner_turn
+signal right_turn
+signal left_turn
 signal round_over
 
 var card_being_dragged
 var screen_size
 var is_hovering_on_card
 var cardConfigs
-var player_hand
+var players = {}
 var current_player = FIRST_PLAYER
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	screen_size = get_viewport_rect().size
 	cardConfigs = preload("res://config/cards.gd")
-	player_hand = $"../PlayerHand"
+
+	players.set("player", Player.new(150, "bottom", true))
+	players.set("partner", Player.new(150, "top", false))
+	players.set("left", Player.new(150, "left", false))
+	players.set("right", Player.new(150, "right", false))
+
+	players.player.name = "player"
+	players.partner.name = "partner"
+	players.left.name = "left"
+	players.right.name = "right"
+
+	$"..".add_child.call_deferred(players.player)
+	$"..".add_child.call_deferred(players.partner)
+	$"..".add_child.call_deferred(players.left)
+	$"..".add_child.call_deferred(players.right)
+
+	connect_player_signals(players.player)
+	connect_player_signals(players.partner)
+	connect_player_signals(players.left)
+	connect_player_signals(players.right)
 	
 	self.call_deferred("_on_turn_ready")
 
@@ -52,7 +73,7 @@ func finish_drag():
 		
 		var card_slot_found = raycast_check_for_card_slot()
 		if card_slot_found: # and not card_slot_found.card_in_slot:
-			player_hand.remove_card_from_hand(card_being_dragged)
+			players.player.remove_card_from_hand(card_being_dragged)
 			card_slot_found.card_in_slot = true
 			
 			var positionTween = get_tree().create_tween()
@@ -62,16 +83,28 @@ func finish_drag():
 			
 			card_being_dragged.slot = card_slot_found
 			card_being_dragged.is_draggable = false
-			print("Player played")
-			player_hand.emit_signal("turn_ready")
+			players.player.emit_signal("turn_ready")
 		else:
-			player_hand.add_card_to_hand(card_being_dragged)
+			players.player.add_card_to_hand(card_being_dragged)
 		
 		card_being_dragged = null
 
 func connect_card_signals(card):
 	card.connect("hovered", _on_hovered_over_card)
 	card.connect("hovered_off", _on_hovered_off_card)
+
+func connect_player_signals(player):
+	match player.name:
+		"player":
+			self.player_turn.connect(player._on_turn)
+		"partner":
+			self.partner_turn.connect(player._on_turn)
+		"left":
+			self.left_turn.connect(player._on_turn)
+		"right":
+			self.right_turn.connect(player._on_turn)
+
+	player.turn_ready.connect(_on_turn_ready)
 
 func _on_hovered_over_card(card):
 	if !is_hovering_on_card:
@@ -116,10 +149,10 @@ func raycast_check_for_card() -> Node2D:
 		return get_card_with_highest_z_index(result)
 	return null 
 
-func raycast_check_for_pile(position: Vector2):
+func raycast_check_for_pile(pos: Vector2):
 	var space_state = get_world_2d().direct_space_state
 	var parameters = PhysicsPointQueryParameters2D.new()
-	parameters.position = position
+	parameters.position = pos
 	parameters.collide_with_areas = true
 	parameters.collision_mask = COLLISION_MASK_CARD
 	var result = space_state.intersect_point(parameters)
@@ -152,23 +185,31 @@ func sort_z_indexes():
 		card.z_index = sorted_cards[card]
 
 func _on_turn_ready() -> void:
+	await get_tree().create_timer(0.5).timeout
 	sort_z_indexes()
-	if current_player == 0:
-		current_player += 1
-		emit_signal("player_turn")
-	elif current_player == 1:
-		current_player += 1
-		emit_signal("partner_turn")
-	else:
-		current_player = 0
-		emit_signal("round_over")
+
+	match current_player:
+		0:
+			current_player += 1
+			emit_signal("player_turn")
+		1:
+			current_player += 1
+			emit_signal("left_turn")
+		2:
+			current_player += 1
+			emit_signal("partner_turn")
+		3:
+			current_player += 1
+			emit_signal("right_turn")
+		_:
+			current_player = 0
+			emit_signal("round_over")
 
 func _on_round_over() -> void:
 	await get_tree().create_timer(0.5).timeout
 	var pile = raycast_check_for_pile(Vector2(screen_size.x/2, screen_size.y/2))
 	var high_card = get_card_with_highest_z_index(pile)
 	print(high_card.player)
-	print(pile)
 	for i in pile:
 		var card = i.collider.get_parent()
 		var posTween = get_tree().create_tween()
