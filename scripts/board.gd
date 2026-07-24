@@ -1,22 +1,32 @@
 extends Node2D
 
+#region Definition
+
 const COLLISION_MASK_CARD = 1
 const COLLISION_MASK_CARD_SLOT = 2
 const FIRST_PLAYER = 0
+
 
 signal player_turn
 signal partner_turn
 signal right_turn
 signal left_turn
+
 signal round_over
 
-var card_being_dragged
+
 var screen_size
+
+var card_being_dragged
 var is_hovering_on_card
 var cardConfigs
+
 var players = {}
 var current_player = FIRST_PLAYER
 
+#endregion
+
+#region Methods
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	screen_size = get_viewport_rect().size
@@ -27,25 +37,15 @@ func _ready() -> void:
 	players.set("left", Player.new(150, "left", false))
 	players.set("right", Player.new(150, "right", false))
 
-	players.player.name = "player"
-	players.partner.name = "partner"
-	players.left.name = "left"
-	players.right.name = "right"
-
-	$"..".add_child.call_deferred(players.player)
-	$"..".add_child.call_deferred(players.partner)
-	$"..".add_child.call_deferred(players.left)
-	$"..".add_child.call_deferred(players.right)
-
-	connect_player_signals(players.player)
-	connect_player_signals(players.partner)
-	connect_player_signals(players.left)
-	connect_player_signals(players.right)
+	for p in players:
+		players[p].name = p
+		$"..".add_child.call_deferred(players[p])
+		connect_player_signals(players[p])
 	
 	self.call_deferred("_on_turn_ready")
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if card_being_dragged:
 		var mouse_pos = get_global_mouse_position()
 		card_being_dragged.position = Vector2(clamp(mouse_pos.x, 0, screen_size.x), clamp(mouse_pos.y, 0, screen_size.y))
@@ -59,6 +59,7 @@ func _input(event):
 		else:
 			finish_drag()
 
+#region Drag
 func start_drag(card):
 	card_being_dragged = card
 	if card_being_dragged.slot:
@@ -88,7 +89,9 @@ func finish_drag():
 			players.player.add_card_to_hand(card_being_dragged)
 		
 		card_being_dragged = null
+#endregion
 
+#region Signals
 func connect_card_signals(card):
 	card.connect("hovered", _on_hovered_over_card)
 	card.connect("hovered_off", _on_hovered_off_card)
@@ -105,7 +108,9 @@ func connect_player_signals(player):
 			self.right_turn.connect(player._on_turn)
 
 	player.turn_ready.connect(_on_turn_ready)
+#endregion
 
+#region Highlights
 func _on_hovered_over_card(card):
 	if !is_hovering_on_card:
 		is_hovering_on_card = true
@@ -126,7 +131,9 @@ func highlight_card(card, hovered):
 		card.scale = Vector2(1.05, 1.05)
 	else:
 		card.scale = Vector2(1, 1)
+#endregion
 
+#region Raycasts
 func raycast_check_for_card_slot() -> Node2D:
 	var space_state = get_world_2d().direct_space_state
 	var parameters = PhysicsPointQueryParameters2D.new()
@@ -183,6 +190,7 @@ func sort_z_indexes():
 	
 	for card in sorted_cards:
 		card.z_index = sorted_cards[card]
+#endregion
 
 func _on_turn_ready() -> void:
 	await get_tree().create_timer(0.5).timeout
@@ -217,3 +225,5 @@ func _on_round_over() -> void:
 		await posTween.finished
 		card.queue_free()
 	_on_turn_ready()
+
+#endregion

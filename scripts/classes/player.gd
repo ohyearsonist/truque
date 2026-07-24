@@ -20,13 +20,13 @@ var hand = []
 signal turn_ready
 #endregion
 
+#region Methods
 # Constructor
 func _init(dist=150, edge="bottom", isPlayer=false) -> void:
 	DISTANCE_FROM_EDGE = dist
 	EDGE = edge
 	IS_PLAYER = isPlayer
 
-# Methods
 func _ready() -> void:
 	center_screen_x = get_viewport_rect().size.x / 2
 	center_screen_y = get_viewport_rect().size.y / 2
@@ -59,6 +59,7 @@ func _ready() -> void:
 func ready() -> void:
 	pass # To be overwritten
 
+#region Hand management
 func add_card_to_hand(card):
 	if card not in hand:
 		hand.insert(0, card)
@@ -70,6 +71,7 @@ func remove_card_from_hand(card):
 	if card in hand:
 		hand.erase(card)
 		update_hand_positions()
+#endregion
 
 func play_card(card):
 	remove_card_from_hand(card)
@@ -79,6 +81,7 @@ func play_card(card):
 	var rotationTween = get_tree().create_tween()
 	rotationTween.tween_property(card, "rotation", randi() % 360, 0.1)
 	
+#region Position
 func update_hand_positions():
 	for i in range(hand.size()):
 		var new_position
@@ -99,14 +102,15 @@ func update_hand_positions():
 func calculate_card_position(index):
 	if self.EDGE == "top" or self.EDGE == "bottom":
 		var hand_visual_size = (hand.size() - 1) * CARD_WIDTH
-		return center_screen_x + (index * CARD_WIDTH) - (hand_visual_size / 2)
+		return center_screen_x + (index * CARD_WIDTH) - (hand_visual_size / 2.)
 	else:
 		var hand_visual_size = (hand.size() - 1) * CARD_WIDTH
-		return center_screen_y + (index * CARD_WIDTH) - (hand_visual_size / 2)
+		return center_screen_y + (index * CARD_WIDTH) - (hand_visual_size / 2.)
 
 func animate_card_to_position(card, pos):
 	var tween = get_tree().create_tween()
 	tween.tween_property(card, "position", pos, 0.12)
+#endregion
 
 func _on_turn() -> void:
 	if not IS_PLAYER:
@@ -116,3 +120,4 @@ func _on_turn() -> void:
 		for card in hand:
 			card.get_node("CoverImage").visible = false
 			card.is_draggable = true
+#endregion
