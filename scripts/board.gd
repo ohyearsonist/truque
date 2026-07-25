@@ -2,9 +2,9 @@ extends Node2D
 
 #region Definition
 
-const COLLISION_MASK_CARD = 1
-const COLLISION_MASK_CARD_SLOT = 2
-const FIRST_PLAYER = 0
+@export var COLLISION_MASK_CARD : int
+@export var COLLISION_MASK_CARD_SLOT : int
+@export var FIRST_PLAYER : int
 
 
 signal player_turn
@@ -13,7 +13,6 @@ signal right_turn
 signal left_turn
 
 signal round_over
-
 
 var screen_size
 
@@ -32,6 +31,8 @@ var winnerList = []
 var currentRound = 0
 
 var previousHands = []
+
+var familyList = []
 
 #endregion
 
@@ -102,9 +103,11 @@ func finish_drag():
 			players.player.add_card_to_hand(card_being_dragged)
 		
 		card_being_dragged = null
+
 #endregion
 
 #region Signals
+
 func connect_card_signals(card):
 	card.connect("hovered", _on_hovered_over_card)
 	card.connect("hovered_off", _on_hovered_off_card)
@@ -121,6 +124,13 @@ func connect_player_signals(player):
 			self.right_turn.connect(player._on_turn)
 
 	player.turn_ready.connect(_on_turn_ready)
+
+func _on_deck_depleted() -> void:
+	$"../UI/BottomRightButtons/ChangeCards".disabled = true
+
+func _on_deck_shuffled() -> void:
+	$"../UI/BottomRightButtons/ChangeCards".disabled = false
+
 #endregion
 
 #region Highlights
@@ -205,6 +215,9 @@ func sort_z_indexes():
 		card.z_index = sorted_cards[card]
 #endregion
 
+#region Game Logic
+#region State Machine
+
 func _on_turn_ready() -> void:
 	await get_tree().create_timer(0.5).timeout
 	sort_z_indexes()
@@ -246,6 +259,33 @@ func _on_round_over() -> void:
 		card.queue_free()
 	_on_turn_ready()
 
+#endregion
+
+#region Game Rules
+func _on_change_cards():
+	var cardDict = {"player": players.player, "cards": []}	
+
+	for card in range(players.player.hand.size()):
+		cardDict.cards.append(card)
+
+		var posTween = get_tree().create_tween()
+		posTween.tween_property(
+			players.player.hand[0],
+			"position",
+			Vector2(screen_size.x/2, screen_size.y + players.player.CARD_WIDTH),
+			0.1
+		)
+
+		players.player.remove_card_from_hand(players.player.hand[0])
+		await posTween.finished
+	
+	familyList.append(cardDict)
+
+	for i in range(players.player.HAND_SIZE):
+		players.player.add_card_to_hand(deck.generate_random_card(), true)
+#endregion
+
+#region Helper Functions
 func checkAnteWinner():
 	var playerPair = 0
 	var otherPair = 0
@@ -262,12 +302,23 @@ func checkAnteWinner():
 		previousHands.append("other")
 
 func redistributeCards():
+	if familyList.size() > 0:
+		for family in range(familyList.size()):
+			for card in range(familyList[family].cards.size()):
+				familyList[family].cards.queue_free()
+		familyList = []
+
 	deck.shuffleDeck()
 
 	for p in players:
 		for i in range(players[p].HAND_SIZE):
 			players[p].add_card_to_hand(deck.generate_random_card(), true)
 
+#endregion
+
+#endregion
+
+#region Menus and Popups
 func pauseMenu():
 	if paused:
 		$"../UI/PauseMenu".hide()
@@ -285,5 +336,6 @@ func cardOrder():
 		$"../UI/CardOrder".show()
 	
 	cardOrderShown = !cardOrderShown
+#endregion
 
 #endregion
