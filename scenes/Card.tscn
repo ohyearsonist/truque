@@ -1,25 +1,29 @@
 [gd_scene format=3 uid="uid://c6thhxwvlhrvt"]
 
-[ext_resource type="Texture2D" uid="uid://d0fl6rowblr87" path="res://assets/cards/Suit=Spades, Number=Ace.png" id="1_d81rb"]
+[ext_resource type="Texture2D" uid="uid://dpgsfm8uf8bvi" path="res://assets/cards/Suit=Spades, Number=Ace.png" id="1_d81rb"]
 [ext_resource type="Script" uid="uid://bb8n7uhiaoqh2" path="res://scripts/nodes/card.gd" id="2_6u4wf"]
-[ext_resource type="Texture2D" uid="uid://d4mdsm280i8m7" path="res://assets/cards/Suit=Other, Number=Back Red.png" id="3_4dx8l"]
+[ext_resource type="Texture2D" uid="uid://b4mic07psosjo" path="res://assets/cards/card_back.png" id="3_4dx8l"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1q6dv"]
-size = Vector2(204, 287)
+size = Vector2(197, 280)
 
 [node name="Card" type="Node2D" unique_id=1317320863]
 script = ExtResource("2_6u4wf")
 
 [node name="CardImage" type="Sprite2D" parent="." unique_id=86706670]
+texture_filter = 5
+scale = Vector2(4.5, 4.5)
 texture = ExtResource("1_d81rb")
 
 [node name="CoverImage" type="Sprite2D" parent="." unique_id=24758891]
+texture_filter = 5
+scale = Vector2(4.5, 4.5)
 texture = ExtResource("3_4dx8l")
 
 [node name="Area2D" type="Area2D" parent="." unique_id=865449897]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=629004337]
-position = Vector2(0, -4.5)
+position = Vector2(0.5, -1)
 shape = SubResource("RectangleShape2D_1q6dv")
 
 [connection signal="mouse_entered" from="Area2D" to="." method="_on_area_2d_mouse_entered"]
