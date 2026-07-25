@@ -17,12 +17,18 @@ signal round_over
 
 var screen_size
 
+var cardConfigs
 var card_being_dragged
 var is_hovering_on_card
-var cardConfigs
+var deck
 
 var players = {}
 var current_player = FIRST_PLAYER
+
+var winnerList = []
+var currentRound = 0
+
+var previousHands = []
 
 #endregion
 
@@ -30,6 +36,7 @@ var current_player = FIRST_PLAYER
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	screen_size = get_viewport_rect().size
+	deck = $"../Deck"
 	cardConfigs = preload("res://config/cards.gd")
 
 	players.set("player", Player.new(150, "bottom", true))
@@ -214,10 +221,17 @@ func _on_turn_ready() -> void:
 			emit_signal("round_over")
 
 func _on_round_over() -> void:
+	currentRound += 1
+
+	if currentRound == 3:
+		currentRound = 0
+		checkAnteWinner()
+		redistributeCards()
+
 	await get_tree().create_timer(0.5).timeout
 	var pile = raycast_check_for_pile(Vector2(screen_size.x/2, screen_size.y/2))
 	var high_card = get_card_with_highest_z_index(pile)
-	print(high_card.player)
+	winnerList.append(high_card.player)
 	for i in pile:
 		var card = i.collider.get_parent()
 		var posTween = get_tree().create_tween()
@@ -225,5 +239,27 @@ func _on_round_over() -> void:
 		await posTween.finished
 		card.queue_free()
 	_on_turn_ready()
+
+func checkAnteWinner():
+	var playerPair = 0
+	var otherPair = 0
+
+	for r in range(winnerList.size()):
+		if winnerList[r] == players.player or winnerList[r] == players.partner:
+			playerPair += 1
+		elif winnerList[r] == players.left or winnerList[r] == players.right:
+			otherPair += 1
+	
+	if playerPair > otherPair:
+		previousHands.append("player")
+	elif otherPair > playerPair:
+		previousHands.append("other")
+
+func redistributeCards():
+	deck.shuffleDeck()
+
+	for p in players:
+		for i in range(players[p].HAND_SIZE):
+			players[p].add_card_to_hand(deck.generate_random_card(), true)
 
 #endregion

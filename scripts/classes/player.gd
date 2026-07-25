@@ -15,6 +15,8 @@ var center_screen_x
 var center_screen_y
 var deck_reference
 
+var card_scene
+
 var hand = []
 
 signal turn_ready
@@ -32,16 +34,25 @@ func _ready() -> void:
 	center_screen_y = get_viewport_rect().size.y / 2
 	deck_reference = $"../Deck"
 
-	var card_scene = preload(CARD_SCENE_PATH)
+	card_scene = preload(CARD_SCENE_PATH)
 	for i in range(HAND_SIZE):
 		var card_data = deck_reference.generate_random_card()
+		add_card_to_hand(card_data, true)
+	
+	ready()
 
+func ready() -> void:
+	pass # To be overwritten
+
+#region Hand management
+func add_card_to_hand(card=deck_reference.generate_random_card(), deep=false):
+	if deep:
 		var new_card = card_scene.instantiate()
 		$"../Board".add_child(new_card)
 
-		new_card.name = card_data.name
+		new_card.name = card.name
 		new_card.player = self
-		new_card.get_node("CardImage").texture = load(card_data.imagePath)
+		new_card.get_node("CardImage").texture = load(card.imagePath)
 
 		if IS_PLAYER:
 			new_card.get_node("CoverImage").visible = false
@@ -52,20 +63,17 @@ func _ready() -> void:
 		elif EDGE == "right":
 			new_card.rotation = -(PI/2)
 
-		add_card_to_hand(new_card)
-	
-	ready()
-
-func ready() -> void:
-	pass # To be overwritten
-
-#region Hand management
-func add_card_to_hand(card):
-	if card not in hand:
-		hand.insert(0, card)
-		update_hand_positions()
+		if new_card not in hand:
+			hand.insert(0, new_card)
+			update_hand_positions()
+		else:
+			animate_card_to_position(new_card, new_card.hand_position)
 	else:
-		animate_card_to_position(card, card.hand_position)
+		if card not in hand:
+			hand.insert(0, card)
+			update_hand_positions()
+		else:
+			animate_card_to_position(card, card.hand_position)
 
 func remove_card_from_hand(card):
 	if card in hand:
