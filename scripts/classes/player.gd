@@ -7,7 +7,7 @@ var DISTANCE_FROM_EDGE
 var EDGE # bottom (default) | top | left | right
 var IS_PLAYER
 
-const CARD_SCENE_PATH = "res://scenes/Card.tscn"
+const CARD_SCENE_PATH = "res://scenes/prefabs/Card.tscn"
 #endregion
 
 #region Declarations

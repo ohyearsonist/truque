@@ -1,0 +1,178 @@
+[gd_scene format=3 uid="uid://4fg5idl0yd8k"]
+
+[ext_resource type="Script" uid="uid://c2q1jydadse5o" path="res://scripts/nodes/card_order.gd" id="1_pw706"]
+[ext_resource type="FontFile" uid="uid://c4nf3w1fsasbn" path="res://assets/fonts/Jersey10-Regular.ttf" id="1_tvnwk"]
+[ext_resource type="Texture2D" uid="uid://dvgiowx067rlk" path="res://assets/cards/Suit=Clubs, Number=4.png" id="2_pw706"]
+[ext_resource type="Texture2D" uid="uid://5mkyhkf4em5v" path="res://assets/cards/Suit=Hearts, Number=7.png" id="3_qrqwt"]
+[ext_resource type="Texture2D" uid="uid://dpgsfm8uf8bvi" path="res://assets/cards/Suit=Spades, Number=Ace.png" id="4_01iry"]
+[ext_resource type="Texture2D" uid="uid://dpm5670o3iugx" path="res://assets/cards/Suit=Diamonds, Number=7.png" id="5_up74r"]
+[ext_resource type="Texture2D" uid="uid://jafh4v1omd18" path="res://assets/cards/Suit=Other, Number=Joker.png" id="6_8efrt"]
+[ext_resource type="Texture2D" uid="uid://c1vjf1ntw7t2" path="res://assets/cards/Suit=Clubs, Number=3.png" id="7_y3nwo"]
+[ext_resource type="Texture2D" uid="uid://bixxbgo1014xu" path="res://assets/cards/Suit=Clubs, Number=2.png" id="8_p2rt7"]
+[ext_resource type="Texture2D" uid="uid://cahihy626h5t7" path="res://assets/cards/Suit=Clubs, Number=Ace.png" id="9_r6vyc"]
+[ext_resource type="Texture2D" uid="uid://j5qegcshmmhl" path="res://assets/cards/Suit=Clubs, Number=King.png" id="10_2mx0a"]
+[ext_resource type="Texture2D" uid="uid://2d5mg8dtl3j4" path="res://assets/cards/Suit=Clubs, Number=Queen.png" id="11_7acg5"]
+[ext_resource type="Texture2D" uid="uid://bswwxurwqdoec" path="res://assets/cards/Suit=Clubs, Number=Jack.png" id="12_ewibt"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3omqf"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.101960786, 0.101960786, 0.101960786, 0.3529412)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[node name="CardOrder" type="Control" unique_id=1598278979]
+custom_minimum_size = Vector2(800, 900)
+custom_maximum_size = Vector2(800, 900)
+layout_mode = 3
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -1000.0
+offset_right = 800.0
+grow_vertical = 0
+size_flags_horizontal = 0
+size_flags_vertical = 8
+script = ExtResource("1_pw706")
+
+[node name="Panel" type="Panel" parent="." unique_id=179470346]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_3omqf")
+
+[node name="Label" type="Label" parent="." unique_id=1043387042]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 20.0
+offset_bottom = 90.0
+grow_horizontal = 2
+theme_override_fonts/font = ExtResource("1_tvnwk")
+theme_override_font_sizes/font_size = 64
+text = "Card Order"
+horizontal_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=440681487]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -278.0
+offset_top = -229.0
+offset_right = 278.0
+offset_bottom = 263.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer" unique_id=274096492]
+layout_mode = 2
+theme_override_constants/separation = 150
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/VBoxContainer" unique_id=561870176]
+layout_mode = 2
+theme_override_constants/separation = 100
+alignment = 1
+
+[node name="4C" type="TextureRect" parent="VBoxContainer/VBoxContainer/HBoxContainer" unique_id=316692360]
+texture_filter = 1
+layout_mode = 2
+offset_transform_enabled = true
+offset_transform_scale = Vector2(3, 3)
+texture = ExtResource("2_pw706")
+
+[node name="7H" type="TextureRect" parent="VBoxContainer/VBoxContainer/HBoxContainer" unique_id=864649059]
+texture_filter = 1
+layout_mode = 2
+offset_transform_enabled = true
+offset_transform_scale = Vector2(3, 3)
+texture = ExtResource("3_qrqwt")
+
+[node name="AS" type="TextureRect" parent="VBoxContainer/VBoxContainer/HBoxContainer" unique_id=438181367]
+texture_filter = 1
+layout_mode = 2
+offset_transform_enabled = true
+offset_transform_scale = Vector2(3, 3)
+texture = ExtResource("4_01iry")
+
+[node name="7D" type="TextureRect" parent="VBoxContainer/VBoxContainer/HBoxContainer" unique_id=1675949883]
+texture_filter = 1
+layout_mode = 2
+offset_transform_enabled = true
+offset_transform_scale = Vector2(3, 3)
+texture = ExtResource("5_up74r")
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer/VBoxContainer" unique_id=507082990]
+layout_mode = 2
+theme_override_constants/separation = 100
+alignment = 1
+
+[node name="JO" type="TextureRect" parent="VBoxContainer/VBoxContainer/HBoxContainer2" unique_id=47074367]
+texture_filter = 1
+layout_mode = 2
+offset_transform_enabled = true
+offset_transform_scale = Vector2(3, 3)
+texture = ExtResource("6_8efrt")
+
+[node name="3X" type="TextureRect" parent="VBoxContainer/VBoxContainer/HBoxContainer2" unique_id=1388499337]
+texture_filter = 1
+layout_mode = 2
+offset_transform_enabled = true
+offset_transform_scale = Vector2(3, 3)
+texture = ExtResource("7_y3nwo")
+
+[node name="2X" type="TextureRect" parent="VBoxContainer/VBoxContainer/HBoxContainer2" unique_id=188497944]
+texture_filter = 1
+layout_mode = 2
+offset_transform_enabled = true
+offset_transform_scale = Vector2(3, 3)
+texture = ExtResource("8_p2rt7")
+
+[node name="AX" type="TextureRect" parent="VBoxContainer/VBoxContainer/HBoxContainer2" unique_id=1126787878]
+texture_filter = 1
+layout_mode = 2
+offset_transform_enabled = true
+offset_transform_scale = Vector2(3, 3)
+texture = ExtResource("9_r6vyc")
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="VBoxContainer/VBoxContainer" unique_id=531497253]
+layout_mode = 2
+theme_override_constants/separation = 100
+alignment = 1
+
+[node name="KX" type="TextureRect" parent="VBoxContainer/VBoxContainer/HBoxContainer3" unique_id=2123950086]
+texture_filter = 1
+layout_mode = 2
+offset_transform_enabled = true
+offset_transform_scale = Vector2(3, 3)
+texture = ExtResource("10_2mx0a")
+
+[node name="QX" type="TextureRect" parent="VBoxContainer/VBoxContainer/HBoxContainer3" unique_id=497181700]
+texture_filter = 1
+layout_mode = 2
+offset_transform_enabled = true
+offset_transform_scale = Vector2(3, 3)
+texture = ExtResource("11_7acg5")
+
+[node name="JX" type="TextureRect" parent="VBoxContainer/VBoxContainer/HBoxContainer3" unique_id=1128778425]
+texture_filter = 1
+layout_mode = 2
+offset_transform_enabled = true
+offset_transform_scale = Vector2(3, 3)
+texture = ExtResource("12_ewibt")
+
+[node name="Timer" type="Timer" parent="." unique_id=1598684157]
+autostart = true
+
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

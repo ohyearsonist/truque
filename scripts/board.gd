@@ -17,6 +17,9 @@ signal round_over
 
 var screen_size
 
+var paused = false
+var cardOrderShown = false
+
 var cardConfigs
 var card_being_dragged
 var is_hovering_on_card
@@ -58,13 +61,16 @@ func _process(_delta: float) -> void:
 		card_being_dragged.position = Vector2(clamp(mouse_pos.x, 0, screen_size.x), clamp(mouse_pos.y, 0, screen_size.y))
 
 func _input(event):
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and !paused:
 		if event.pressed:
 			var card = raycast_check_for_card()
 			if card and card.is_draggable:
 				start_drag(card)
 		else:
 			finish_drag()
+	
+	if Input.is_action_just_pressed("pause"):
+		pauseMenu()
 
 #region Drag
 func start_drag(card):
@@ -134,7 +140,7 @@ func _on_hovered_off_card(card):
 		is_hovering_on_card = false
 
 func highlight_card(card, hovered):
-	if hovered and card.is_draggable:
+	if hovered and card.is_draggable and !paused:
 		card.scale = Vector2(1.05, 1.05)
 	else:
 		card.scale = Vector2(1, 1)
@@ -261,5 +267,23 @@ func redistributeCards():
 	for p in players:
 		for i in range(players[p].HAND_SIZE):
 			players[p].add_card_to_hand(deck.generate_random_card(), true)
+
+func pauseMenu():
+	if paused:
+		$"../UI/PauseMenu".hide()
+		Engine.time_scale = 1
+	else:
+		$"../UI/PauseMenu".show()
+		Engine.time_scale = 0
+	
+	paused = !paused
+
+func cardOrder():
+	if cardOrderShown:
+		$"../UI/CardOrder".hide()
+	else:
+		$"../UI/CardOrder".show()
+	
+	cardOrderShown = !cardOrderShown
 
 #endregion

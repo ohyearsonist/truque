@@ -1,0 +1,100 @@
+[gd_scene format=3 uid="uid://badhlqdk14mtr"]
+
+[ext_resource type="FontFile" uid="uid://d2qf1iu6gaof2" path="res://assets/fonts/Jersey25-Regular.ttf" id="1_g4jo0"]
+[ext_resource type="Script" uid="uid://cw2tbmh8ht80x" path="res://scripts/pause_menu.gd" id="1_komsw"]
+[ext_resource type="FontFile" uid="uid://cu0cgrpdn2if8" path="res://assets/fonts/Tiny5-Regular.ttf" id="2_komsw"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5w6ei"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.101960786, 0.101960786, 0.101960786, 0.3529412)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[node name="PauseMenu" type="Control" unique_id=1567680981]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_komsw")
+
+[node name="Panel" type="Panel" parent="." unique_id=248513239]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_5w6ei")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1353989047]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 25
+alignment = 1
+
+[node name="Label" type="Label" parent="VBoxContainer" unique_id=390882496]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("1_g4jo0")
+theme_override_font_sizes/font_size = 128
+text = "Paused"
+horizontal_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer" unique_id=301333370]
+layout_mode = 2
+theme_override_constants/separation = 13
+
+[node name="Button" type="Button" parent="VBoxContainer/VBoxContainer" unique_id=203494271]
+custom_minimum_size = Vector2(350, 100)
+custom_maximum_size = Vector2(500, -1)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("2_komsw")
+theme_override_font_sizes/font_size = 32
+text = "Resume"
+
+[node name="Button2" type="Button" parent="VBoxContainer/VBoxContainer" unique_id=2111479779]
+custom_minimum_size = Vector2(350, 100)
+custom_maximum_size = Vector2(500, -1)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("2_komsw")
+theme_override_font_sizes/font_size = 32
+text = "Settings"
+
+[node name="Button3" type="Button" parent="VBoxContainer/VBoxContainer" unique_id=1693233539]
+custom_minimum_size = Vector2(350, 100)
+custom_maximum_size = Vector2(500, -1)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("2_komsw")
+theme_override_font_sizes/font_size = 32
+text = "Main Menu"
+
+[node name="Button4" type="Button" parent="VBoxContainer/VBoxContainer" unique_id=1778080196]
+custom_minimum_size = Vector2(350, 100)
+custom_maximum_size = Vector2(500, -1)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("2_komsw")
+theme_override_font_sizes/font_size = 32
+text = "Quit"
+
+[connection signal="pressed" from="VBoxContainer/VBoxContainer/Button" to="." method="_on_resume_pressed"]
+[connection signal="pressed" from="VBoxContainer/VBoxContainer/Button3" to="." method="_on_mainmenu_pressed"]
+[connection signal="pressed" from="VBoxContainer/VBoxContainer/Button4" to="." method="_on_quit_pressed"]
