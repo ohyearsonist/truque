@@ -79,6 +79,19 @@ func remove_card_from_hand(card):
 	if card in hand:
 		hand.erase(card)
 		update_hand_positions()
+
+func clearHand():
+	for card in range(hand.size()):
+		var posTween = get_tree().create_tween()
+		posTween.tween_property(
+			hand[0],
+			"position",
+			Vector2(get_viewport_rect().size.x/2, get_viewport_rect().size.y + CARD_WIDTH),
+			0.1
+		)
+
+		remove_card_from_hand(hand[0])
+		await posTween.finished
 #endregion
 
 func play_card(card):

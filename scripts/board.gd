@@ -13,6 +13,12 @@ signal right_turn
 signal left_turn
 
 signal round_over
+signal player_raise_stakes
+signal confirmation_signal
+
+var currentStakes = 1
+
+var confirmID = "Refuse"
 
 var screen_size
 
@@ -131,6 +137,11 @@ func _on_deck_depleted() -> void:
 func _on_deck_shuffled() -> void:
 	$"../UI/BottomRightButtons/ChangeCards".disabled = false
 
+func _on_confirm_button_pressed(id):
+	confirmID = id
+	$"../UI/AcceptStakes".visible = false
+	emit_signal("confirmation_signal")
+
 #endregion
 
 #region Highlights
@@ -242,21 +253,21 @@ func _on_turn_ready() -> void:
 func _on_round_over() -> void:
 	currentRound += 1
 
+	var pile = raycast_check_for_pile(Vector2(screen_size.x/2, screen_size.y/2))
+	var high_card = get_card_with_highest_z_index(pile)
+	winnerList.append(high_card.player)
+
+	await get_tree().create_timer(0.5).timeout
+	clearPile(pile)
+
 	if currentRound == 3:
 		currentRound = 0
 		checkAnteWinner()
 		redistributeCards()
+	
+	if currentRound == 1:
+		raiseStakes()
 
-	await get_tree().create_timer(0.5).timeout
-	var pile = raycast_check_for_pile(Vector2(screen_size.x/2, screen_size.y/2))
-	var high_card = get_card_with_highest_z_index(pile)
-	winnerList.append(high_card.player)
-	for i in pile:
-		var card = i.collider.get_parent()
-		var posTween = get_tree().create_tween()
-		posTween.tween_property(card, "position", Vector2(screen_size.x/2, screen_size.y * 1.3), 0.1)
-		await posTween.finished
-		card.queue_free()
 	_on_turn_ready()
 
 #endregion
@@ -268,21 +279,58 @@ func _on_change_cards():
 	for card in range(players.player.hand.size()):
 		cardDict.cards.append(card)
 
-		var posTween = get_tree().create_tween()
-		posTween.tween_property(
-			players.player.hand[0],
-			"position",
-			Vector2(screen_size.x/2, screen_size.y + players.player.CARD_WIDTH),
-			0.1
-		)
-
-		players.player.remove_card_from_hand(players.player.hand[0])
-		await posTween.finished
+	players.player.clearHand()
 	
 	familyList.append(cardDict)
 
 	for i in range(players.player.HAND_SIZE):
 		players.player.add_card_to_hand(deck.generate_random_card(), true)
+
+## For other players to raise the stakes
+func raiseStakes():
+	$"../UI/AcceptStakes".visible = true
+	await confirmation_signal
+	var acceptedRaise
+	if confirmID == "Accept":
+		acceptedRaise = true
+	else:
+		acceptedRaise = false
+
+	if !acceptedRaise:
+		previousHands.append("other")
+		currentRound = 0
+
+		var cardsToFree = []
+		for p in players:
+			for card in players[p].hand:
+				cardsToFree.append(card)
+			await players[p].clearHand()
+		for card in cardsToFree:
+			card.queue_free()
+			cardsToFree.erase(card)
+
+		clearPile(
+			raycast_check_for_pile(Vector2(screen_size.x/2, screen_size.y/2))
+		)
+
+		await get_tree().create_timer(0.1).timeout
+
+		redistributeCards()
+
+		return
+
+	match currentStakes:
+		1:
+			currentStakes = 3
+			print(currentStakes)
+		3:
+			currentStakes = 6
+		6:
+			currentStakes = 12
+
+## For the player to raise the stakes
+func _on_raise_stakes() -> void:
+	pass # Replace with function body.
 #endregion
 
 #region Helper Functions
@@ -296,10 +344,15 @@ func checkAnteWinner():
 		elif winnerList[r] == players.left or winnerList[r] == players.right:
 			otherPair += 1
 	
-	if playerPair > otherPair:
-		previousHands.append("player")
-	elif otherPair > playerPair:
-		previousHands.append("other")
+	for i in range(currentStakes):
+		if playerPair > otherPair:
+			previousHands.append("player")
+		elif otherPair > playerPair:
+			previousHands.append("other")
+	
+	currentStakes = 1
+	
+	print(previousHands)
 
 func redistributeCards():
 	if familyList.size() > 0:
@@ -314,6 +367,14 @@ func redistributeCards():
 		for i in range(players[p].HAND_SIZE):
 			players[p].add_card_to_hand(deck.generate_random_card(), true)
 
+func clearPile(pile):
+	if pile != null:
+		for i in pile:
+			var card = i.collider.get_parent()
+			var posTween = get_tree().create_tween()
+			posTween.tween_property(card, "position", Vector2(screen_size.x/2, screen_size.y * 1.3), 0.1)
+			await posTween.finished
+			card.queue_free()
 #endregion
 
 #endregion

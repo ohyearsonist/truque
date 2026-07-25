@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://badhlqdk14mtr" path="res://scenes/prefabs/PauseMenu.tscn" id="5_tefeu"]
 [ext_resource type="Texture2D" uid="uid://dryb17su3oqs3" path="res://assets/icons/pause.png" id="6_tipki"]
 [ext_resource type="Texture2D" uid="uid://b6yjl5421s3xg" path="res://assets/icons/information.png" id="7_85g3d"]
+[ext_resource type="FontFile" uid="uid://c4nf3w1fsasbn" path="res://assets/fonts/Jersey10-Regular.ttf" id="9_85g3d"]
 
 [node name="Main" type="Node2D" unique_id=724509265]
 
@@ -16,9 +17,11 @@ script = ExtResource("5_tbgi4")
 
 [node name="Board" type="Node2D" parent="." unique_id=1635455840]
 script = ExtResource("1_0wfyh")
+COLLISION_MASK_CARD = 1
+COLLISION_MASK_CARD_SLOT = 2
 
 [node name="CardSlot" parent="." unique_id=1931621865 instance=ExtResource("3_sugp2")]
-position = Vector2(990, 540)
+position = Vector2(960, 540)
 
 [node name="Hand" type="Node2D" parent="." unique_id=492222675]
 
@@ -57,7 +60,7 @@ offset_bottom = -10.0
 grow_vertical = 0
 texture_normal = ExtResource("7_85g3d")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="UI" unique_id=681409691]
+[node name="BottomRightButtons" type="VBoxContainer" parent="UI" unique_id=681409691]
 anchors_preset = 3
 anchor_left = 1.0
 anchor_top = 1.0
@@ -71,17 +74,81 @@ grow_horizontal = 0
 grow_vertical = 0
 theme_override_constants/separation = 11
 
-[node name="ChangeCards" type="Button" parent="UI/VBoxContainer" unique_id=1443412334]
+[node name="ChangeCards" type="Button" parent="UI/BottomRightButtons" unique_id=1443412334]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("4_jyhfs")
 theme_override_font_sizes/font_size = 32
 text = "Change cards"
 
-[node name="RaiseStakes" type="Button" parent="UI/VBoxContainer" unique_id=985759516]
+[node name="RaiseStakes" type="Button" parent="UI/BottomRightButtons" unique_id=985759516]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("4_jyhfs")
 theme_override_font_sizes/font_size = 32
 text = "Raise stakes"
+
+[node name="AcceptStakes" type="Control" parent="UI" unique_id=287030355]
+visible = false
+custom_minimum_size = Vector2(500, 300)
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="UI/AcceptStakes" unique_id=702534335]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/AcceptStakes" unique_id=1725826408]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 40
+alignment = 1
+
+[node name="LabelContainer" type="VBoxContainer" parent="UI/AcceptStakes/VBoxContainer" unique_id=2067424798]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="UI/AcceptStakes/VBoxContainer/LabelContainer" unique_id=1238540944]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("9_85g3d")
+theme_override_font_sizes/font_size = 36
+text = "They want to raise the stake!"
+horizontal_alignment = 1
+
+[node name="PointLabel" type="Label" parent="UI/AcceptStakes/VBoxContainer/LabelContainer" unique_id=2130977699]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_jyhfs")
+theme_override_font_sizes/font_size = 27
+text = "(3 points)"
+horizontal_alignment = 1
+
+[node name="ButtonContainer" type="HBoxContainer" parent="UI/AcceptStakes/VBoxContainer" unique_id=578108091]
+layout_mode = 2
+theme_override_constants/separation = 35
+alignment = 1
+
+[node name="Accept" type="Button" parent="UI/AcceptStakes/VBoxContainer/ButtonContainer" unique_id=1844150572]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_jyhfs")
+theme_override_font_sizes/font_size = 30
+text = "Accept"
+
+[node name="Refuse" type="Button" parent="UI/AcceptStakes/VBoxContainer/ButtonContainer" unique_id=643364714]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_jyhfs")
+theme_override_font_sizes/font_size = 30
+text = "Refuse"
 
 [connection signal="deck_depleted" from="Deck" to="Board" method="_on_deck_depleted"]
 [connection signal="deck_shuffled" from="Deck" to="Deck" method="_on_deck_shuffled"]
@@ -89,4 +156,7 @@ text = "Raise stakes"
 [connection signal="unpause" from="UI/PauseMenu" to="Board" method="pauseMenu"]
 [connection signal="pressed" from="UI/PauseButton" to="Board" method="pauseMenu"]
 [connection signal="pressed" from="UI/CardOrderButton" to="Board" method="cardOrder"]
-[connection signal="pressed" from="UI/VBoxContainer/ChangeCards" to="Board" method="_on_change_cards"]
+[connection signal="pressed" from="UI/BottomRightButtons/ChangeCards" to="Board" method="_on_change_cards"]
+[connection signal="pressed" from="UI/BottomRightButtons/RaiseStakes" to="Board" method="_on_raise_stakes"]
+[connection signal="pressed" from="UI/AcceptStakes/VBoxContainer/ButtonContainer/Accept" to="Board" method="_on_confirm_button_pressed" binds= ["Accept"]]
+[connection signal="pressed" from="UI/AcceptStakes/VBoxContainer/ButtonContainer/Refuse" to="Board" method="_on_confirm_button_pressed" binds= ["Refuse"]]
