@@ -1,8 +1,9 @@
 [gd_scene format=3 uid="uid://c6thhxwvlhrvt"]
 
-[ext_resource type="Texture2D" uid="uid://dpgsfm8uf8bvi" path="res://assets/cards/Suit=Spades, Number=Ace.png" id="1_d81rb"]
 [ext_resource type="Script" uid="uid://bb8n7uhiaoqh2" path="res://scripts/nodes/card.gd" id="2_6u4wf"]
+[ext_resource type="Texture2D" uid="uid://bob76wt03yg3o" path="res://assets/cards/card_empty.png" id="2_risks"]
 [ext_resource type="Texture2D" uid="uid://b4mic07psosjo" path="res://assets/cards/card_back.png" id="3_4dx8l"]
+[ext_resource type="FontFile" uid="uid://cu0cgrpdn2if8" path="res://assets/fonts/Tiny5-Regular.ttf" id="3_u0w14"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1q6dv"]
 size = Vector2(197, 280)
@@ -13,7 +14,23 @@ script = ExtResource("2_6u4wf")
 [node name="CardImage" type="Sprite2D" parent="." unique_id=86706670]
 texture_filter = 5
 scale = Vector2(4.5, 4.5)
-texture = ExtResource("1_d81rb")
+texture = ExtResource("2_risks")
+
+[node name="Label" type="Label" parent="." unique_id=1511650813]
+visible = false
+custom_minimum_size = Vector2(150, 0)
+custom_maximum_size = Vector2(150, -1)
+offset_left = -75.0
+offset_top = -16.0
+offset_right = 75.0
+offset_bottom = 15.0
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(0.3019608, 0.34117648, 0.4, 1)
+theme_override_fonts/font = ExtResource("3_u0w14")
+theme_override_font_sizes/font_size = 27
+text = "Name"
+horizontal_alignment = 1
+autowrap_mode = 3
 
 [node name="CoverImage" type="Sprite2D" parent="." unique_id=24758891]
 texture_filter = 5

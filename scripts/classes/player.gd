@@ -54,6 +54,10 @@ func add_card_to_hand(card=deck_reference.generate_random_card(), deep=false):
 		new_card.player = self
 		new_card.get_node("CardImage").texture = load(card.imagePath)
 
+		if card.isSpecial:
+			new_card.get_node("Label").visible = true
+			new_card.get_node("Label").text = card.name
+
 		if IS_PLAYER:
 			new_card.get_node("CoverImage").visible = false
 			new_card.is_draggable = true

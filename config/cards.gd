@@ -138,15 +138,74 @@ const CARDS = {
 		"imagePath": "res://assets/cards/Suit=Other, Number=Joker.png",
 		"isSpecial": false,
 		"isHigh": true
+	},
+
+	"XRay": {
+		"imagePath": "res://assets/cards/card_empty.png",
+		"isSpecial": true,
+		"isHigh": false
+	},
+	"Polymorph": {
+		"imagePath": "res://assets/cards/card_empty.png",
+		"isSpecial": true,
+		"isHigh": false
+	},
+	"Backstab": {
+		"imagePath": "res://assets/cards/card_empty.png",
+		"isSpecial": true,
+		"isHigh": false
+	},
+	"Switcher": {
+		"imagePath": "res://assets/cards/card_empty.png",
+		"isSpecial": true,
+		"isHigh": false
+	},
+	"Pocket": {
+		"imagePath": "res://assets/cards/card_empty.png",
+		"isSpecial": true,
+		"isHigh": false
+	},
+	"Big Hand": {
+		"imagePath": "res://assets/cards/card_empty.png",
+		"isSpecial": true,
+		"isHigh": false
+	},
+	"Gimme": {
+		"imagePath": "res://assets/cards/card_empty.png",
+		"isSpecial": true,
+		"isHigh": false
+	},
+	"Signal": {
+		"imagePath": "res://assets/cards/card_empty.png",
+		"isSpecial": true,
+		"isHigh": false
+	},
+	"Reset": {
+		"imagePath": "res://assets/cards/card_empty.png",
+		"isSpecial": true,
+		"isHigh": false
 	}
 }
 
 const CARD_ORDER = [
+	"Backstab",
+
 	"JC", "JH", "JD", "JS",
 	"QC", "QH", "QD", "QS",
 	"KC", "KH", "KD", "KS",
 	"AC", "AH", "AD",
 	"2C", "2H", "2D", "2S",
 	"3C", "3H", "3D", "3S",
+
+	"XRay", "Polymorph", "Switcher",
+	"Pocket", "Big Hand", "Gimme",
+	"Signal", "Reset",
+
 	"JO", "7D", "AS", "7H", "4C"
+]
+
+const SPECIAL_CARD_LIST = [
+	"Signal", "Reset", "Backstab",
+	"XRay", "Polymorph", "Switcher",
+	"Pocket", "Big Hand", "Gimme"
 ]
