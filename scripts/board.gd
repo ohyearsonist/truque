@@ -258,7 +258,7 @@ func _on_round_over() -> void:
 	winnerList.append(high_card.player)
 
 	await get_tree().create_timer(0.5).timeout
-	clearPile(pile)
+	clearPile(pile, high_card.player.EDGE)
 
 	if currentRound == 3:
 		currentRound = 0
@@ -277,15 +277,16 @@ func _on_change_cards():
 	var cardDict = {"player": players.player, "cards": []}	
 
 	for card in range(players.player.hand.size()):
-		cardDict.cards.append(card)
+		cardDict.cards.append(players.player.hand[card])
 
-	players.player.clearHand()
+	await players.player.clearHand()
 	
 	familyList.append(cardDict)
 
 	for i in range(players.player.HAND_SIZE):
 		players.player.add_card_to_hand(deck.generate_random_card(), true)
 
+#region Stakes
 ## For other players to raise the stakes
 func raiseStakes():
 	$"../UI/AcceptStakes".visible = true
@@ -297,40 +298,57 @@ func raiseStakes():
 		acceptedRaise = false
 
 	if !acceptedRaise:
-		previousHands.append("other")
-		currentRound = 0
-
-		var cardsToFree = []
-		for p in players:
-			for card in players[p].hand:
-				cardsToFree.append(card)
-			await players[p].clearHand()
-		for card in cardsToFree:
-			card.queue_free()
-			cardsToFree.erase(card)
-
-		clearPile(
-			raycast_check_for_pile(Vector2(screen_size.x/2, screen_size.y/2))
-		)
-
-		await get_tree().create_timer(0.1).timeout
-
-		redistributeCards()
-
+		refusedStakes("other")
 		return
+	
+	acceptStakes()
 
+## For the player to raise the stakes
+func _on_raise_stakes() -> void:
+	var acceptChance = randi() % 100 + 1
+
+	if acceptChance > 50:
+		acceptStakes()
+		print("stakes accepted")
+	else:
+		refusedStakes("player")
+		print("stakes refused")
+
+func refusedStakes(winner : String):
+	for i in range(currentStakes):
+		previousHands.append(winner)
+
+	currentRound = 0
+	currentStakes = 1
+	$"../UI/InfoHUD/Stakes".text = "Stakes: " + str(currentStakes)
+	$"../UI/InfoHUD/HandsLabel".text = "Player: " + str(previousHands.count("player")) + \
+		"; Other: " + str(previousHands.count("other"))
+
+	var cardsToFree = []
+	for p in players:
+		for card in players[p].hand:
+			cardsToFree.append(card)
+		await players[p].clearHand()
+	for card in cardsToFree:
+		card.queue_free()
+		cardsToFree.erase(card)
+
+	await get_tree().create_timer(0.1).timeout
+
+	redistributeCards()
+
+func acceptStakes():
 	match currentStakes:
 		1:
 			currentStakes = 3
-			print(currentStakes)
 		3:
 			currentStakes = 6
 		6:
 			currentStakes = 12
+	
+	$"../UI/InfoHUD/Stakes".text = "Stakes: " + str(currentStakes)
 
-## For the player to raise the stakes
-func _on_raise_stakes() -> void:
-	pass # Replace with function body.
+#endregion
 #endregion
 
 #region Helper Functions
@@ -351,6 +369,10 @@ func checkAnteWinner():
 			previousHands.append("other")
 	
 	currentStakes = 1
+	$"../UI/InfoHUD/Stakes".text = "Stakes: " + str(currentStakes)
+
+	$"../UI/InfoHUD/HandsLabel".text = "Player: " + str(previousHands.count("player")) + \
+		"; Other: " + str(previousHands.count("other"))
 	
 	print(previousHands)
 
@@ -358,7 +380,7 @@ func redistributeCards():
 	if familyList.size() > 0:
 		for family in range(familyList.size()):
 			for card in range(familyList[family].cards.size()):
-				familyList[family].cards.queue_free()
+				familyList[family].cards[card].queue_free()
 		familyList = []
 
 	deck.shuffleDeck()
@@ -367,12 +389,24 @@ func redistributeCards():
 		for i in range(players[p].HAND_SIZE):
 			players[p].add_card_to_hand(deck.generate_random_card(), true)
 
-func clearPile(pile):
+func clearPile(pile, direction="bottom"):
 	if pile != null:
 		for i in pile:
 			var card = i.collider.get_parent()
 			var posTween = get_tree().create_tween()
-			posTween.tween_property(card, "position", Vector2(screen_size.x/2, screen_size.y * 1.3), 0.1)
+
+			var finalPos
+			match direction:
+				"bottom":
+					finalPos = Vector2(screen_size.x/2, screen_size.y * 1.3)
+				"top":
+					finalPos = Vector2(screen_size.x/2, -(screen_size.y * 0.4))
+				"left":
+					finalPos = Vector2(-(screen_size.x * 0.4), screen_size.y/2)
+				"right":
+					finalPos = Vector2(screen_size.x * 1.3, screen_size.y/2)
+
+			posTween.tween_property(card, "position", finalPos, 0.1)
 			await posTween.finished
 			card.queue_free()
 #endregion

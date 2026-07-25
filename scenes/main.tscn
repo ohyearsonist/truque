@@ -38,54 +38,6 @@ z_index = 999
 size_flags_horizontal = 6
 size_flags_vertical = 6
 
-[node name="PauseButton" type="TextureButton" parent="UI" unique_id=1685648344]
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -60.0
-offset_top = 10.0
-offset_right = -10.0
-offset_bottom = 60.0
-grow_horizontal = 0
-texture_normal = ExtResource("6_tipki")
-
-[node name="CardOrderButton" type="TextureButton" parent="UI" unique_id=858460886]
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = -60.0
-offset_right = 60.0
-offset_bottom = -10.0
-grow_vertical = 0
-texture_normal = ExtResource("7_85g3d")
-
-[node name="BottomRightButtons" type="VBoxContainer" parent="UI" unique_id=681409691]
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -127.0
-offset_top = -81.0
-offset_right = -15.0
-offset_bottom = -15.0
-grow_horizontal = 0
-grow_vertical = 0
-theme_override_constants/separation = 11
-
-[node name="ChangeCards" type="Button" parent="UI/BottomRightButtons" unique_id=1443412334]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_jyhfs")
-theme_override_font_sizes/font_size = 32
-text = "Change cards"
-
-[node name="RaiseStakes" type="Button" parent="UI/BottomRightButtons" unique_id=985759516]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_jyhfs")
-theme_override_font_sizes/font_size = 32
-text = "Raise stakes"
-
 [node name="AcceptStakes" type="Control" parent="UI" unique_id=287030355]
 visible = false
 custom_minimum_size = Vector2(500, 300)
@@ -95,6 +47,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -150.0
+offset_right = 250.0
+offset_bottom = 150.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -150,13 +106,79 @@ theme_override_fonts/font = ExtResource("4_jyhfs")
 theme_override_font_sizes/font_size = 30
 text = "Refuse"
 
+[node name="PauseButton" type="TextureButton" parent="UI" unique_id=1685648344]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -60.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = 60.0
+grow_horizontal = 0
+texture_normal = ExtResource("6_tipki")
+
+[node name="CardOrderButton" type="TextureButton" parent="UI" unique_id=858460886]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = -60.0
+offset_right = 60.0
+offset_bottom = -10.0
+grow_vertical = 0
+texture_normal = ExtResource("7_85g3d")
+
+[node name="BottomRightButtons" type="VBoxContainer" parent="UI" unique_id=681409691]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -127.0
+offset_top = -81.0
+offset_right = -15.0
+offset_bottom = -15.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_constants/separation = 11
+
+[node name="ChangeCards" type="Button" parent="UI/BottomRightButtons" unique_id=1443412334]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_jyhfs")
+theme_override_font_sizes/font_size = 32
+text = "Change cards"
+
+[node name="RaiseStakes" type="Button" parent="UI/BottomRightButtons" unique_id=985759516]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_jyhfs")
+theme_override_font_sizes/font_size = 32
+text = "Raise stakes"
+
+[node name="InfoHUD" type="VBoxContainer" parent="UI" unique_id=296278939]
+offset_left = 15.0
+offset_top = 15.0
+offset_right = 263.0
+offset_bottom = 91.0
+
+[node name="Stakes" type="Label" parent="UI/InfoHUD" unique_id=853512107]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_jyhfs")
+theme_override_font_sizes/font_size = 32
+text = "Stakes: 1"
+
+[node name="HandsLabel" type="Label" parent="UI/InfoHUD" unique_id=1082197403]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_jyhfs")
+theme_override_font_sizes/font_size = 32
+text = "Player: 0; Other: 0"
+
 [connection signal="deck_depleted" from="Deck" to="Board" method="_on_deck_depleted"]
 [connection signal="deck_shuffled" from="Deck" to="Deck" method="_on_deck_shuffled"]
 [connection signal="round_over" from="Board" to="Board" method="_on_round_over"]
 [connection signal="unpause" from="UI/PauseMenu" to="Board" method="pauseMenu"]
+[connection signal="pressed" from="UI/AcceptStakes/VBoxContainer/ButtonContainer/Accept" to="Board" method="_on_confirm_button_pressed" binds= ["Accept"]]
+[connection signal="pressed" from="UI/AcceptStakes/VBoxContainer/ButtonContainer/Refuse" to="Board" method="_on_confirm_button_pressed" binds= ["Refuse"]]
 [connection signal="pressed" from="UI/PauseButton" to="Board" method="pauseMenu"]
 [connection signal="pressed" from="UI/CardOrderButton" to="Board" method="cardOrder"]
 [connection signal="pressed" from="UI/BottomRightButtons/ChangeCards" to="Board" method="_on_change_cards"]
 [connection signal="pressed" from="UI/BottomRightButtons/RaiseStakes" to="Board" method="_on_raise_stakes"]
-[connection signal="pressed" from="UI/AcceptStakes/VBoxContainer/ButtonContainer/Accept" to="Board" method="_on_confirm_button_pressed" binds= ["Accept"]]
-[connection signal="pressed" from="UI/AcceptStakes/VBoxContainer/ButtonContainer/Refuse" to="Board" method="_on_confirm_button_pressed" binds= ["Refuse"]]
