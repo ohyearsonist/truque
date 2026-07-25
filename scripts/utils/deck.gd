@@ -22,6 +22,13 @@ func generate_random_card():
 	return_dict["name"] = card
 	return return_dict
 
+func generate_specific_card(n):
+	var card = n
+	remaining_deck.erase(card)
+	var return_dict = CARD_CONFIGS.CARDS[card].duplicate(true)
+	return_dict["name"] = card
+	return return_dict
+
 func shuffleDeck():
 	remaining_deck = []
 	for card in CARD_CONFIGS.CARDS:

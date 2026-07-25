@@ -50,8 +50,8 @@ func _ready() -> void:
 	cardConfigs = preload("res://config/cards.gd")
 
 	players.set("player", Player.new(150, "bottom", true))
-	players.set("partner", Player.new(150, "top", false))
 	players.set("left", Player.new(150, "left", false))
+	players.set("partner", Player.new(150, "top", false))
 	players.set("right", Player.new(150, "right", false))
 
 	for p in players:
@@ -216,6 +216,23 @@ func get_card_with_highest_z_index(cards):
 	
 	return highest_z_card
 
+func sort_cards_by_z_index(cards):
+	cards.sort_custom(func (a, b):
+		var current_card = a.collider.get_parent().z_index
+		var next_card = b.collider.get_parent()	.z_index
+
+		if current_card > next_card:
+			return false
+		else:
+			return true
+	)
+
+	var return_array = []
+	for col in cards:
+		return_array.append(col.collider.get_parent())
+
+	return return_array
+	
 func sort_z_indexes():
 	var sorted_cards = {}
 	for card in self.get_children():
@@ -254,8 +271,13 @@ func _on_round_over() -> void:
 	currentRound += 1
 
 	var pile = raycast_check_for_pile(Vector2(screen_size.x/2, screen_size.y/2))
-	var high_card = get_card_with_highest_z_index(pile)
-	winnerList.append(high_card.player)
+	var card_array = sort_cards_by_z_index(pile)
+	var high_card = card_array[0]
+
+	if high_card.name == "4C" and card_array[-1].name == "Backstab":
+		winnerList.append(card_array[-1].player)
+	else:
+		winnerList.append(high_card.player)
 
 	await get_tree().create_timer(0.5).timeout
 	clearPile(pile, high_card.player.EDGE)
@@ -265,8 +287,9 @@ func _on_round_over() -> void:
 		checkAnteWinner()
 		redistributeCards()
 	
-	if currentRound == 1:
-		raiseStakes()
+	if currentRound != 0:
+		if randi() % 100 + 1 > 70:
+			raiseStakes()
 
 	_on_turn_ready()
 
