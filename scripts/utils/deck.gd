@@ -1,5 +1,8 @@
 extends Node2D
 
+signal deck_depleted
+signal deck_shuffled
+
 var CARD_CONFIGS
 var remaining_deck = []
 
@@ -7,6 +10,10 @@ var remaining_deck = []
 func _ready() -> void:
 	CARD_CONFIGS = preload("res://config/cards.gd")
 	shuffleDeck()
+
+func _process(_delta: float) -> void:
+	if remaining_deck.size() < 3:
+		emit_signal("deck_depleted")
 
 func generate_random_card():
 	var card = remaining_deck.pick_random()
@@ -20,3 +27,4 @@ func shuffleDeck():
 	for card in CARD_CONFIGS.CARDS:
 		remaining_deck.push_front(card)
 	remaining_deck.shuffle()
+	emit_signal("deck_shuffled")

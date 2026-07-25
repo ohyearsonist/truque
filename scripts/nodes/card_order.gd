@@ -51,11 +51,6 @@ func _ready() -> void:
 	cardsToLoop.append($"./VBoxContainer/VBoxContainer/HBoxContainer3/QX")
 	cardsToLoop.append($"./VBoxContainer/VBoxContainer/HBoxContainer3/JX")
 
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
-
 func _on_timer_timeout():
 	if counter == 4:
 		counter = 0
@@ -64,3 +59,6 @@ func _on_timer_timeout():
 		card.texture = load(images[card.name][counter])
 
 	counter += 1	
+
+func _on_how_to_ready() -> void:
+	$"./Panel".visible = false
