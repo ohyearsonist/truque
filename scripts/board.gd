@@ -276,6 +276,9 @@ func _on_round_over() -> void:
 
 	if high_card.name == "4C" and card_array[-1].name == "Backstab":
 		winnerList.append(card_array[-1].player)
+	elif card_array.find_custom(func (i): return i.name == "XRay") != -1 and \
+		card_array[card_array.find_custom(func (i): return i.name == "XRay")].player == players.player:
+			players.partner.showDeck()
 	else:
 		winnerList.append(high_card.player)
 
@@ -284,6 +287,10 @@ func _on_round_over() -> void:
 
 	if currentRound == 3:
 		currentRound = 0
+
+		if players.partner.SHOW_DECK:
+			players.partner.showDeck()
+
 		checkAnteWinner()
 		redistributeCards()
 	

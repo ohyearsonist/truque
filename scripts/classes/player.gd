@@ -6,6 +6,7 @@ var CARD_WIDTH = 250
 var DISTANCE_FROM_EDGE
 var EDGE # bottom (default) | top | left | right
 var IS_PLAYER
+var SHOW_DECK = false
 
 const CARD_SCENE_PATH = "res://scenes/prefabs/Card.tscn"
 #endregion
@@ -96,6 +97,17 @@ func clearHand():
 
 		remove_card_from_hand(hand[0])
 		await posTween.finished
+
+func showDeck():
+	SHOW_DECK = !SHOW_DECK
+
+	if SHOW_DECK:
+		for card in hand:
+			card.get_node("CoverImage").visible = false
+	else:
+		for card in hand:
+			card.get_node("CoverImage").visible = true
+
 #endregion
 
 func play_card(card):
