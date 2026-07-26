@@ -36,6 +36,10 @@ func _ready() -> void:
 	deck_reference = $"../Deck"
 
 	card_scene = preload(CARD_SCENE_PATH)
+
+	if IS_PLAYER:
+		add_card_to_hand(deck_reference.generate_specific_card("Pocket"), true)
+
 	for i in range(HAND_SIZE):
 		var card_data = deck_reference.generate_random_card()
 		add_card_to_hand(card_data, true)
@@ -150,6 +154,11 @@ func animate_card_to_position(card, pos):
 #endregion
 
 func _on_turn() -> void:
+	if hand.size() == 0 and IS_PLAYER:
+		$"../UI/PassTurnButton".visible = true
+	elif hand.size() == 0 and !IS_PLAYER:
+		emit_signal("turn_ready")
+
 	if not IS_PLAYER:
 		play_card(hand.pick_random())
 		emit_signal("turn_ready")

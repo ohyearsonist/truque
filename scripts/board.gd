@@ -13,14 +13,16 @@ signal right_turn
 signal left_turn
 
 signal round_over
-signal player_raise_stakes
 signal confirmation_signal
+signal player_pocket_enabled
 
 var currentStakes = 1
 
 var confirmID = "Refuse"
 
 var screen_size
+
+var playerHandSizeResetList = []
 
 var paused = false
 var cardOrderShown = false
@@ -93,7 +95,22 @@ func finish_drag():
 		card_being_dragged.scale = Vector2(1.05, 1.05)
 		
 		var card_slot_found = raycast_check_for_card_slot()
-		if card_slot_found: # and not card_slot_found.card_in_slot:
+		if card_slot_found:
+			if card_slot_found.name == "Pocket" and not card_slot_found.card_in_slot:
+				players.player.remove_card_from_hand(card_being_dragged)
+				card_slot_found.card_in_slot = true
+				
+				var posTween = get_tree().create_tween()
+				posTween.tween_property(card_being_dragged, "position", card_slot_found.position, 0.1)
+				
+				card_being_dragged.slot = card_slot_found
+				card_being_dragged = null
+				return
+			elif card_slot_found.name == "Pocket" and card_slot_found.card_in_slot:
+				players.player.add_card_to_hand(card_being_dragged)
+				card_being_dragged = null
+				return
+
 			players.player.remove_card_from_hand(card_being_dragged)
 			card_slot_found.card_in_slot = true
 			
@@ -141,6 +158,10 @@ func _on_confirm_button_pressed(id):
 	confirmID = id
 	$"../UI/AcceptStakes".visible = false
 	emit_signal("confirmation_signal")
+
+func _on_player_pocket_enabled():
+	$"../Pocket".visible = true
+	$"../Pocket".get_node("Sprite2D").visible = true
 
 #endregion
 
@@ -247,6 +268,9 @@ func sort_z_indexes():
 #region State Machine
 
 func _on_turn_ready() -> void:
+	if $"../UI/PassTurnButton".visible:
+		$"../UI/PassTurnButton".visible = false
+
 	await get_tree().create_timer(0.5).timeout
 	sort_z_indexes()
 
@@ -272,15 +296,20 @@ func _on_round_over() -> void:
 
 	var pile = raycast_check_for_pile(Vector2(screen_size.x/2, screen_size.y/2))
 	var card_array = sort_cards_by_z_index(pile)
-	var high_card = card_array[0]
+	var high_card = card_array[-1]
 
 	if high_card.name == "4C" and card_array[-1].name == "Backstab":
-		winnerList.append(card_array[-1].player)
+		high_card = card_array[-1]
 	elif card_array.find_custom(func (i): return i.name == "XRay") != -1 and \
-		card_array[card_array.find_custom(func (i): return i.name == "XRay")].player == players.player:
-			players.partner.showDeck()
-	else:
-		winnerList.append(high_card.player)
+	card_array[card_array.find_custom(func (i): return i.name == "XRay")].player == players.player:
+		players.partner.showDeck()
+	elif card_array.find_custom(func (i): return i.name == "Gimme") != -1:
+		var p = card_array[card_array.find_custom(func (i): return i.name == "Gimme")].player
+		p.HAND_SIZE = 4
+	elif card_array.find_custom(func (i): return i.name == "Pocket") != -1:
+		emit_signal("player_pocket_enabled")
+
+	winnerList.append(high_card.player)
 
 	await get_tree().create_timer(0.5).timeout
 	clearPile(pile, high_card.player.EDGE)
@@ -290,6 +319,16 @@ func _on_round_over() -> void:
 
 		if players.partner.SHOW_DECK:
 			players.partner.showDeck()
+		
+		for p in players:
+			if players[p].HAND_SIZE > 3 and playerHandSizeResetList.find(players[p]) == -1:
+				playerHandSizeResetList.append.call_deferred(players[p])
+
+			if playerHandSizeResetList.find(players[p]) != -1:
+				players[p].HAND_SIZE = 3
+				playerHandSizeResetList.erase(players[p])
+			
+			players[p].clearHand()
 
 		checkAnteWinner()
 		redistributeCards()
@@ -404,8 +443,6 @@ func checkAnteWinner():
 	$"../UI/InfoHUD/HandsLabel".text = "Player: " + str(previousHands.count("player")) + \
 		"; Other: " + str(previousHands.count("other"))
 	
-	print(previousHands)
-
 func redistributeCards():
 	if familyList.size() > 0:
 		for family in range(familyList.size()):
@@ -416,6 +453,9 @@ func redistributeCards():
 	deck.shuffleDeck()
 
 	for p in players:
+		for i in range(players[p].hand.size()):
+			players[p].hand[0].queue_free()
+
 		for i in range(players[p].HAND_SIZE):
 			players[p].add_card_to_hand(deck.generate_random_card(), true)
 
@@ -439,6 +479,11 @@ func clearPile(pile, direction="bottom"):
 			posTween.tween_property(card, "position", finalPos, 0.1)
 			await posTween.finished
 			card.queue_free()
+		
+func clearBoard():
+	for c in self.get_children():
+		c.queue_free()
+
 #endregion
 
 #endregion

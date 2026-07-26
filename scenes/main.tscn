@@ -25,6 +25,10 @@ position = Vector2(960, 540)
 
 [node name="Hand" type="Node2D" parent="." unique_id=492222675]
 
+[node name="Pocket" parent="." unique_id=1703678065 instance=ExtResource("3_sugp2")]
+visible = false
+position = Vector2(1578, 1046)
+
 [node name="UI" type="CanvasLayer" parent="." unique_id=703565419]
 follow_viewport_enabled = true
 
@@ -173,8 +177,26 @@ theme_override_fonts/font = ExtResource("4_jyhfs")
 theme_override_font_sizes/font_size = 32
 text = "Player: 0; Other: 0"
 
+[node name="PassTurnButton" type="Button" parent="UI" unique_id=115177164]
+visible = false
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -72.0
+offset_top = -130.0
+offset_right = 72.0
+offset_bottom = -86.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_fonts/font = ExtResource("4_jyhfs")
+theme_override_font_sizes/font_size = 32
+text = "Pass Turn"
+
 [connection signal="deck_depleted" from="Deck" to="Board" method="_on_deck_depleted"]
 [connection signal="deck_shuffled" from="Deck" to="Deck" method="_on_deck_shuffled"]
+[connection signal="player_pocket_enabled" from="Board" to="Board" method="_on_player_pocket_enabled"]
 [connection signal="round_over" from="Board" to="Board" method="_on_round_over"]
 [connection signal="unpause" from="UI/PauseMenu" to="Board" method="pauseMenu"]
 [connection signal="pressed" from="UI/AcceptStakes/VBoxContainer/ButtonContainer/Accept" to="Board" method="_on_confirm_button_pressed" binds= ["Accept"]]
@@ -183,3 +205,4 @@ text = "Player: 0; Other: 0"
 [connection signal="pressed" from="UI/CardOrderButton" to="Board" method="cardOrder"]
 [connection signal="pressed" from="UI/BottomRightButtons/ChangeCards" to="Board" method="_on_change_cards"]
 [connection signal="pressed" from="UI/BottomRightButtons/RaiseStakes" to="Board" method="_on_raise_stakes"]
+[connection signal="pressed" from="UI/PassTurnButton" to="Board" method="_on_turn_ready"]
